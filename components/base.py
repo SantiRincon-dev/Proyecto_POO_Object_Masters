@@ -99,7 +99,10 @@ class CircuitElement(ABC):
         """
         i = node_map[self._node_pos]
         j = node_map[self._node_neg]
-        return float(x[i] - x[j])
+        Vi = float(x[i]) if i is not None else 0.0
+        Vj = float(x[j]) if j is not None else 0.0
+
+        return Vi - Vj
 
     # ── Representación ────────────────────────────────────────────
 

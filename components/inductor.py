@@ -111,12 +111,15 @@ class Inductor(CircuitElement):
         j = node_map[self._node_neg]
         k = self._current_var_idx
 
-        G[i][k] += 1
-        G[j][k] -= 1
-        G[k][i] += 1
-        G[k][j] -= 1
-        G[k][k] -= self._inductance / dt
+        if i is not None:
+            G[i][k] += 1
+            G[k][i] += 1
 
+        if j is not None:
+            G[j][k] -= 1
+            G[k][j] -= 1
+
+        G[k][k] -= self._inductance / dt
         b[k] -= (self._inductance / dt) * self._I_prev
 
     def get_current(self, x: np.ndarray, node_map: dict, **kwargs) -> float:

@@ -88,13 +88,20 @@ class Capacitor(CircuitElement):
         geq = self._capacitance / dt
         Ieq = geq * self._V_prev
 
-        G[i][i] += geq
-        G[j][j] += geq
-        G[i][j] -= geq
-        G[j][i] -= geq
+        if i is not None:
+            G[i][i] += geq
+            if j is not None:
+                G[i][j] -= geq
 
-        b[i] += Ieq
-        b[j] -= Ieq
+        if j is not None:
+            G[j][j] += geq
+            if i is not None:
+                G[j][i] -= geq
+
+        if i is not None:
+            b[i] += Ieq
+        if j is not None:
+            b[j] -= Ieq
 
     def get_current(self, x: np.ndarray, node_map: dict, **kwargs) -> float:
         """

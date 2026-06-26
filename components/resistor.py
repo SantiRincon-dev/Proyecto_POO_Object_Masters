@@ -55,10 +55,15 @@ class Resistor(CircuitElement):
         j = node_map[self._node_neg]
         g = self.conductance
 
-        G[i][i] += g
-        G[j][j] += g
-        G[i][j] -= g
-        G[j][i] -= g
+        if i is not None:
+            G[i][i] += g
+            if j is not None:
+                G[i][j] -= g
+
+        if j is not None:
+            G[j][j] += g
+            if i is not None:
+                G[j][i] -= g
 
     def get_current(self, x: np.ndarray, node_map: dict, **kwargs) -> float:
         """
