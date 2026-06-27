@@ -39,8 +39,8 @@ class RLCSeries(BaseCircuit):
         return self._capacitor
 
     def _assign_nodes(self) -> None:
-        self._switch.node_pos = 2
-        self._switch.node_neg = 1
+        self._switch.node_pos = 1
+        self._switch.node_neg = 0
 
         self._resistor.node_pos = 2
         self._resistor.node_neg = 3
@@ -51,11 +51,11 @@ class RLCSeries(BaseCircuit):
         self._capacitor.node_pos = 4
         self._capacitor.node_neg = 0
 
-        self._source.node_pos = 1
-        self._source.node_neg = 0
+        self._source.node_pos = 2
+        self._source.node_neg = 1
 
         self._node_count = 4
-        self._elements = [self._resistor, self._inductor, self._capacitor, self._switch]
+        self._elements = [self._resistor, self._inductor, self._capacitor]
 
     def __repr__(self) -> str:
         return (

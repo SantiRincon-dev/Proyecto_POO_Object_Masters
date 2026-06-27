@@ -116,8 +116,7 @@ class Capacitor(CircuitElement):
 
         V = self.get_voltage(x, node_map)
         geq = self._capacitance / dt
-        Ieq = geq * self._V_prev
-        return geq * V - Ieq
+        return geq * (V - self._V_prev)
 
     def update_state(self, x: np.ndarray, node_map: dict) -> None:
         """

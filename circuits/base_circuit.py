@@ -92,10 +92,10 @@ class BaseCircuit(ABC):
     def get_all(self) -> list:
         """
         Retorna todos los elementos del circuito incluyendo
-        componentes pasivos, fuente y switch.
-        Útil para el plotter cuando necesita graficar todo.
+        componentes pasivos y fuente, excluyendo el switch
+        ya que no aporta información relevante a los resultados.
         """
-        return self._elements + [self._source, self._switch]
+        return self._elements + [self._source]
 
     def __repr__(self) -> str:
         return (

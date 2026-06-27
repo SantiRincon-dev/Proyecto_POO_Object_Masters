@@ -63,20 +63,11 @@ class DCVoltageSource(Source):
 
         b[k] += self._voltage
 
-    def get_current(self, x: np.ndarray) -> float:
-        """
-        Retorna la corriente entregada por la fuente.
-        Positiva cuando fluye de node_neg a node_pos internamente
-        (convenio de fuente).
-        """
+    def get_current(self, x: np.ndarray, node_map: dict = None, **kwargs) -> float:
         self._check_current_var_idx()
-        return float(x[self._current_var_idx])
+        return -float(x[self._current_var_idx])
 
-    def get_voltage(self, x: np.ndarray) -> float:
-        """
-        El voltaje de la fuente DC es siempre su valor nominal.
-        No depende del vector solución.
-        """
+    def get_voltage(self, x: np.ndarray = None, node_map: dict = None) -> float:
         return float(self._voltage)
 
     # ── Representación ────────────────────────────────────────────

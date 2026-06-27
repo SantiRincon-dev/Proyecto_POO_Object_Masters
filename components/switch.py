@@ -97,32 +97,22 @@ class Switch(CircuitElement):
             if i is not None:
                 G[j][i] -= g
 
-    def get_current(self, x: np.ndarray, node_map: dict, **kwargs) -> float:
-        """
-        Calcula la corriente a través del switch.
-
-        Si está abierto la corriente es 0.
-        Si está cerrado se calcula como I = G_CLOSED * V,
-        que al ser G_CLOSED muy alta aproxima el comportamiento
-        de un cable ideal donde V ≈ 0.
-        """
-        if not self._closed:
-            return 0.0
-        V = self.get_voltage(x, node_map)
-        return V * self.G_CLOSED
-
     def get_voltage(self, x: np.ndarray, node_map: dict) -> float:
-        """
-        Voltaje a través del switch.
-
-        Si está abierto el voltaje puede ser cualquier valor
-        (lo impone el resto del circuito).
-        Si está cerrado el voltaje debería ser ≈ 0V
-        por la alta conductancia.
-        """
         i = node_map[self._node_pos]
         j = node_map[self._node_neg]
-        return float(x[i] - x[j])
+        Vi = float(x[i]) if i is not None else 0.0
+        Vj = float(x[j]) if j is not None else 0.0
+        return Vi - Vj
+
+    def get_current(self, x: np.ndarray, node_map: dict, **kwargs) -> float:
+        if not self._closed:
+            return 0.0
+        i = node_map[self._node_pos]
+        j = node_map[self._node_neg]
+        Vi = float(x[i]) if i is not None else 0.0
+        Vj = float(x[j]) if j is not None else 0.0
+        V = Vi - Vj
+        return V * self.G_CLOSED
 
     def reset(self) -> None:
         """Reinicia el switch a su estado abierto."""

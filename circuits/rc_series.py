@@ -43,11 +43,11 @@ class RCSeries(BaseCircuit):
 
     def _assign_nodes(self) -> None:
 
-        self._source.node_pos = 1
-        self._source.node_neg = 0
+        self._source.node_pos = 2
+        self._source.node_neg = 1
 
-        self._switch.node_pos = 2
-        self._switch.node_neg = 1
+        self._switch.node_pos = 1
+        self._switch.node_neg = 0
 
         self._resistor.node_pos = 2
         self._resistor.node_neg = 3
@@ -56,7 +56,7 @@ class RCSeries(BaseCircuit):
         self._capacitor.node_neg = 0
 
         self._node_count = 3
-        self._elements = [self._resistor, self._capacitor, self._switch]
+        self._elements = [self._resistor, self._capacitor]
 
 
 def __repr__(self) -> str:

@@ -2,7 +2,7 @@
 import numpy as np
 from simulation.sim_result import SimResult
 from circuits.base_circuit import BaseCircuit
-from components import Capacitor, Inductor, Switch
+from components import Capacitor, Inductor
 
 
 class Solver:
@@ -91,21 +91,23 @@ class Solver:
         return idx
 
     def _build_mna_matrix(self, t: float, node_map: dict, dt: float = None) -> tuple:
-        """
-        Construye la matriz G y el vector b para el instante t.
-        """
         size = self._system_size
         G = np.zeros((size, size))
         b = np.zeros(size)
 
+        # Estampar switch explícitamente
+        self._circuit.switch.stamp(G, b, node_map, t=t)
+
+        # Estampar componentes pasivos
         for element in self._circuit.get_elements():
-            if isinstance(element, Switch):
-                element.stamp(G, b, node_map, t=t)
-            elif isinstance(element, (Capacitor, Inductor)):
+            if isinstance(element, Capacitor):
+                element.stamp(G, b, node_map, dt=dt)
+            elif isinstance(element, Inductor):
                 element.stamp(G, b, node_map, dt=dt)
             else:
                 element.stamp(G, b, node_map)
 
+        # Estampar fuente
         self._circuit.source.stamp(G, b, node_map)
 
         return G, b
@@ -146,27 +148,44 @@ class Solver:
         self._system_size = self._assign_current_var_indices()
         node_map = self._build_node_map()
 
-        # DEBUG — borrar después
-        print(f"node_count: {self._circuit.node_count}")
-        print(f"system_size: {self._system_size}")
-        print(f"node_map: {node_map}")
-
         time_steps = np.arange(self._t_start, self._t_end, self._dt)
-        solutions = []
 
-        for t in time_steps:
+        all_elements = self._circuit.get_all()
+        labels = [e.label if e.label else e.__class__.__name__ for e in all_elements]
+        voltages = {label: [] for label in labels}
+        currents = {label: [] for label in labels}
+
+        for idx_t, t in enumerate(time_steps):
             G, b = self._build_mna_matrix(t=t, node_map=node_map, dt=self._dt)
             try:
                 x = np.linalg.solve(G, b)
             except np.linalg.LinAlgError:
                 raise RuntimeError(
                     f"La matriz del sistema es singular en t={t:.6f}s. "
-                    "Verifique la topología del circuito."
+                    f"Verifique la topología del circuito."
                 )
-            solutions.append(x)
+
+            # Guardar resultados ANTES de actualizar estado
+            for element, label in zip(all_elements, labels):
+                try:
+                    v = element.get_voltage(x, node_map)
+                except Exception as e:
+                    print(f"{label} get_voltage ERROR: {e}")
+                    v = 0.0
+                try:
+                    i = element.get_current(x, node_map, dt=self._dt)
+                except Exception as e:
+                    print(f"{label} get_current ERROR: {e}")
+                    i = 0.0
+                voltages[label].append(v)
+                currents[label].append(i)
+
+            # Actualizar estado DESPUÉS de guardar
             self._update_states(x, node_map)
 
-        voltages, currents = self._extract_results(solutions, node_map)
+        voltages = {k: np.array(v) for k, v in voltages.items()}
+        currents = {k: np.array(v) for k, v in currents.items()}
+
         return SimResult(time=time_steps, voltages=voltages, currents=currents)
 
     def solve_dc(self) -> SimResult:

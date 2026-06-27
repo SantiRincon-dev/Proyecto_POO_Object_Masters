@@ -56,15 +56,8 @@ class Plotter:
         ax.set_xlabel(f"Tiempo [{unit}]")
 
     def _get_labels_without_switch(self) -> list:
-        """
-        Retorna las etiquetas de los elementos excluyendo el switch,
-        ya que su gráfica no aporta información relevante.
-        """
-        return [
-            label
-            for label in self._result.labels
-            if "switch" not in label.lower() and "sw" not in label.lower()
-        ]
+        """Retorna todas las etiquetas — el switch ya no viene en los resultados."""
+        return self._result.labels
 
     # ── Métodos públicos ──────────────────────────────────────────
 

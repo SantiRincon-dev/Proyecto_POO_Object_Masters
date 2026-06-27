@@ -27,8 +27,8 @@ class RLParallel(BaseCircuit):
         return self._inductor
 
     def _assign_nodes(self) -> None:
-        self._switch.node_pos = 2
-        self._switch.node_neg = 1
+        self._switch.node_pos = 1
+        self._switch.node_neg = 0
 
         self._resistor.node_pos = 2
         self._resistor.node_neg = 0
@@ -36,11 +36,11 @@ class RLParallel(BaseCircuit):
         self._inductor.node_pos = 2
         self._inductor.node_neg = 0
 
-        self._source.node_pos = 1
-        self._source.node_neg = 0
+        self._source.node_pos = 2
+        self._source.node_neg = 1
 
         self._node_count = 2
-        self._elements = [self._resistor, self._inductor, self._switch]
+        self._elements = [self._resistor, self._inductor]
 
     def __repr__(self) -> str:
         return (
