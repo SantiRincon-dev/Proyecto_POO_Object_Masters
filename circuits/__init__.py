@@ -6,6 +6,7 @@ from circuits.rl_series import RLSeries
 from circuits.rl_parallel import RLParallel
 from circuits.rlc_series import RLCSeries
 from circuits.rlc_parallel import RLCParallel
+from circuits.custom_circuit import CustomCircuit
 
 __all__ = [
     "BaseCircuit",
@@ -15,4 +16,5 @@ __all__ = [
     "RLParallel",
     "RLCSeries",
     "RLCParallel",
+    "CustomCircuit",
 ]

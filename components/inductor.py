@@ -134,13 +134,11 @@ class Inductor(CircuitElement):
         return float(x[self._current_var_idx])
 
     def get_voltage(self, x: np.ndarray, node_map: dict) -> float:
-        """
-        El voltaje del inductor es V[node_pos] - V[node_neg],
-        igual que cualquier otro elemento.
-        """
         i = node_map[self._node_pos]
         j = node_map[self._node_neg]
-        return float(x[i] - x[j])
+        Vi = float(x[i]) if i is not None else 0.0
+        Vj = float(x[j]) if j is not None else 0.0
+        return Vi - Vj
 
     def update_state(self, x: np.ndarray, node_map: dict) -> None:
         """

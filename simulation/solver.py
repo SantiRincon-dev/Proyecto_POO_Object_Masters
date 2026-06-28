@@ -193,6 +193,7 @@ class Solver:
         node_map = self._build_node_map()
 
         G, b = self._build_mna_matrix(t=0, node_map=node_map)
+
         try:
             x = np.linalg.solve(G, b)
         except np.linalg.LinAlgError:
@@ -201,9 +202,12 @@ class Solver:
                 "Verifique que el circuito no tenga nodos flotantes."
             )
 
-        time = np.array([0.0])
-        voltages, currents = self._extract_results([x], node_map)
-        return SimResult(time=time, voltages=voltages, currents=currents)
+        # Generar vector de tiempo completo para que la gráfica sea una línea
+        time_steps = np.arange(self._t_start, self._t_end, self._dt)
+        solutions = [x] * len(time_steps)
+
+        voltages, currents = self._extract_results(solutions, node_map)
+        return SimResult(time=time_steps, voltages=voltages, currents=currents)
 
     def solve(self) -> SimResult:
         """

@@ -1,7 +1,15 @@
 # main.py
 from components import Resistor, Capacitor, Inductor, Switch
 from sources import DCVoltageSource
-from circuits import RCSeries, RCParallel, RLSeries, RLParallel, RLCSeries, RLCParallel
+from circuits import (
+    RCSeries,
+    RCParallel,
+    RLSeries,
+    RLParallel,
+    RLCSeries,
+    RLCParallel,
+    CustomCircuit,
+)
 from simulation import Solver
 from plotting import Plotter
 
@@ -165,6 +173,26 @@ def simulate_rlc_parallel():
     plotter.plot_all()
 
 
+def simulate_custom():
+    resistor = Resistor(resistance=1000, label="R1")
+    capacitor = Capacitor(capacitance=1e-6, initial_voltage=0.0, label="C1")
+    inductor = Inductor(inductance=0.01, initial_current=0.0, label="L1")
+    src = DCVoltageSource(voltage=5.0, label="Vs")
+    sw = Switch(t_close=0.0, label="SW1")
+
+    circuit = CustomCircuit(
+        resistor=resistor, capacitor=capacitor, inductor=inductor, source=src, switch=sw
+    )
+
+    solver = Solver(circuit=circuit, t_start=0.0, t_end=0.01, dt=1e-6)
+    result = solver.solve()
+
+    print(result.summary())
+
+    plotter = Plotter(result=result)
+    plotter.plot_all()
+
+
 if __name__ == "__main__":
     print("Seleccione la simulación a ejecutar:")
     print("  1. RC Serie")
@@ -173,6 +201,7 @@ if __name__ == "__main__":
     print("  4. RL Paralelo")
     print("  5. RLC Serie")
     print("  6. RLC Paralelo")
+    print("  7. Circuito Personalizado")
     print("  0. Todas")
 
     opcion = input("\nOpción: ").strip()
@@ -184,6 +213,7 @@ if __name__ == "__main__":
         "4": simulate_rl_parallel,
         "5": simulate_rlc_series,
         "6": simulate_rlc_parallel,
+        "7": simulate_custom,
     }
 
     if opcion == "0":
