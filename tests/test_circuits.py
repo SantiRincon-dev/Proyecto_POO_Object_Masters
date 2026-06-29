@@ -36,12 +36,12 @@ class TestRCSeries:
     def test_nodos_asignados_correctamente(self):
         r, c, l, src, sw = make_components()
         circuit = RCSeries(resistor=r, capacitor=c, source=src, switch=sw)
-        assert circuit.source.node_pos == 1
-        assert circuit.source.node_neg == 0
-        assert circuit.switch.node_pos == 2
-        assert circuit.switch.node_neg == 1
-        assert r.node_pos == 3
-        assert r.node_neg == 2
+        assert circuit.source.node_pos == 2
+        assert circuit.source.node_neg == 1
+        assert circuit.switch.node_pos == 1
+        assert circuit.switch.node_neg == 0
+        assert r.node_pos == 2
+        assert r.node_neg == 3
         assert c.node_pos == 3
         assert c.node_neg == 0
 
@@ -86,8 +86,8 @@ class TestRLSeries:
     def test_nodos_asignados(self):
         r, c, l, src, sw = make_components()
         circuit = RLSeries(resistor=r, inductor=l, source=src, switch=sw)
-        assert r.node_pos == 3
-        assert r.node_neg == 2
+        assert r.node_pos == 2
+        assert r.node_neg == 3
         assert l.node_pos == 3
         assert l.node_neg == 0
 
@@ -119,10 +119,10 @@ class TestRLCSeries:
     def test_nodos_asignados(self):
         r, c, l, src, sw = make_components()
         circuit = RLCSeries(resistor=r, inductor=l, capacitor=c, source=src, switch=sw)
-        assert r.node_pos == 3
-        assert r.node_neg == 2
-        assert l.node_pos == 4
-        assert l.node_neg == 3
+        assert r.node_pos == 2
+        assert r.node_neg == 3
+        assert l.node_pos == 3
+        assert l.node_neg == 4
         assert c.node_pos == 4
         assert c.node_neg == 0
 
