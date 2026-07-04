@@ -108,12 +108,20 @@ classDiagram
         +_assign_nodes() void
     }
 
+    class CustomCircuit {
+        +resistor Resistor
+        +capacitor Capacitor
+        +inductor Inductor
+        +_assign_nodes() void
+    }
+
     class Solver {
         -BaseCircuit circuit
         -float t_start
         -float t_end
         -float dt
         +build_mna_matrix() tuple
+        +solve() SimResult
         +solve_dc() SimResult
         +solve_transient() SimResult
         +solve_ac() SimResult
@@ -137,6 +145,101 @@ classDiagram
         +save(path) void
     }
 
+    namespace gui {
+        class app {
+            <<module>>
+            +main() void
+        }
+
+        class main_window {
+            <<module>>
+            +create_main_window(root) MainWindow
+        }
+
+        class MainWindow {
+            -SimulationRunner _simulation_runner
+            -ParameterPanel _parameters
+            -PlotPanel _plot_panel
+            -ResultsPanel _results
+            -CircuitPreviewPanel _circuit_preview
+            +_simulate() void
+            +_clear() void
+        }
+
+        class parameter_panel {
+            <<module>>
+        }
+
+        class ParameterPanel {
+            -dict _entries
+            -StringVar _circuit_type
+            +get_config() SimulationConfig
+            +get_preview_data() dict
+            +reset() void
+        }
+
+        class plot_panel {
+            <<module>>
+        }
+
+        class PlotPanel {
+            +show_result(result) void
+            +clear() void
+        }
+
+        class results_panel {
+            <<module>>
+        }
+
+        class ResultsPanel {
+            +show_summary(summary) void
+            +show_error(message) void
+            +clear() void
+        }
+
+        class circuit_preview {
+            <<module>>
+        }
+
+        class CircuitPreviewPanel {
+            +show_preview(preview_data) void
+            +clear() void
+        }
+
+        class simulation_runner {
+            <<module>>
+        }
+
+        class SimulationRunner {
+            -CircuitFactory _circuit_factory
+            +run(config) SimResult
+        }
+
+        class circuit_factory {
+            <<module>>
+        }
+
+        class CircuitFactory {
+            +create(config) BaseCircuit
+        }
+
+        class config {
+            <<module>>
+        }
+
+        class SimulationConfig {
+            <<dataclass>>
+            +str circuit_type
+            +float resistance
+            +float capacitance
+            +float inductance
+            +float source_voltage
+            +float t_start
+            +float t_end
+            +float dt
+        }
+    }
+
     CircuitElement <|-- Resistor
     CircuitElement <|-- Capacitor
     CircuitElement <|-- Inductor
@@ -151,13 +254,44 @@ classDiagram
     BaseCircuit <|-- RLParallel
     BaseCircuit <|-- RLCSeries
     BaseCircuit <|-- RLCParallel
+    BaseCircuit <|-- CustomCircuit
 
     BaseCircuit *-- CircuitElement
     BaseCircuit *-- Source
     BaseCircuit *-- Switch
 
+    app ..> main_window
+    main_window ..> MainWindow
+    MainWindow *-- ParameterPanel
+    MainWindow *-- PlotPanel
+    MainWindow *-- ResultsPanel
+    MainWindow *-- CircuitPreviewPanel
+    MainWindow *-- SimulationRunner
+    parameter_panel ..> ParameterPanel
+    plot_panel ..> PlotPanel
+    results_panel ..> ResultsPanel
+    circuit_preview ..> CircuitPreviewPanel
+    simulation_runner ..> SimulationRunner
+    circuit_factory ..> CircuitFactory
+    config ..> SimulationConfig
+
+    ParameterPanel ..> SimulationConfig
+    ParameterPanel ..> CircuitFactory
+    CircuitPreviewPanel ..> CircuitFactory
+    SimulationRunner *-- CircuitFactory
+    SimulationRunner ..> Solver
+    CircuitFactory ..> SimulationConfig
+    CircuitFactory ..> BaseCircuit
+    CircuitFactory ..> Resistor
+    CircuitFactory ..> Capacitor
+    CircuitFactory ..> Inductor
+    CircuitFactory ..> Switch
+    CircuitFactory ..> DCVoltageSource
+    PlotPanel ..> SimResult
+    ResultsPanel ..> SimResult
     BaseCircuit ..> Solver
     Solver ..> SimResult
+    Solver ..> BaseCircuit
     BaseCircuit ..> Plotter
     Plotter ..> SimResult
 

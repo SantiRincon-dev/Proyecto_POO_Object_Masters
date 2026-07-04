@@ -32,10 +32,11 @@ class ParameterPanel(ttk.LabelFrame):
         "dt": "Paso dt [s]",
     }
 
-    def __init__(self, master, on_simulate, on_clear):
+    def __init__(self, master, on_simulate, on_clear, on_change=None):
         super().__init__(master, text="Parámetros", padding=12)
         self._on_simulate = on_simulate
         self._on_clear = on_clear
+        self._on_change = on_change
         self._entries = {}
         self._circuit_type = tk.StringVar(value=CircuitFactory.RC_SERIES)
 
@@ -50,12 +51,15 @@ class ParameterPanel(ttk.LabelFrame):
             state="readonly",
         )
         circuit_combo.grid(row=0, column=1, sticky="ew", pady=4)
+        circuit_combo.bind("<<ComboboxSelected>>", self._handle_change)
 
         for row, key in enumerate(self.DEFAULTS, start=1):
             ttk.Label(self, text=self.LABELS[key]).grid(row=row, column=0, sticky="w", pady=4)
             entry = ttk.Entry(self)
             entry.insert(0, self.DEFAULTS[key])
             entry.grid(row=row, column=1, sticky="ew", pady=4)
+            entry.bind("<KeyRelease>", self._handle_change)
+            entry.bind("<FocusOut>", self._handle_change)
             self._entries[key] = entry
 
         button_frame = ttk.Frame(self)
@@ -85,9 +89,22 @@ class ParameterPanel(ttk.LabelFrame):
 
         return SimulationConfig(circuit_type=self._circuit_type.get(), **values)
 
+    def get_preview_data(self) -> dict:
+        values = {"circuit_type": self._circuit_type.get()}
+        for key, entry in self._entries.items():
+            values[key] = entry.get().strip()
+        return values
+
     def reset(self):
         self._circuit_type.set(CircuitFactory.RC_SERIES)
         for key, entry in self._entries.items():
             entry.delete(0, tk.END)
             entry.insert(0, self.DEFAULTS[key])
+        self._notify_change()
 
+    def _handle_change(self, _event=None):
+        self._notify_change()
+
+    def _notify_change(self):
+        if self._on_change is not None:
+            self._on_change(self.get_preview_data())

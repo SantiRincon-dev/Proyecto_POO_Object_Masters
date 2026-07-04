@@ -32,6 +32,33 @@ Una vez definido el circuito, se crea un Solver al que se le pasa la topología 
 
 Finalmente, el Plotter recibe el SimResult y genera las gráficas de voltaje y corriente en función del tiempo para cada elemento, permitiendo visualizar el comportamiento transitorio del circuito.
 
+## Interfaz Gráfica (GUI)
+
+Además de la interfaz por consola, el proyecto cuenta con una interfaz gráfica desarrollada con Tkinter. La GUI no reemplaza la lógica original del simulador: funciona como una capa de presentación adicional que utiliza las mismas clases de circuitos, componentes, fuentes y motor de simulación.
+
+La aplicación gráfica se puede ejecutar de cualquiera de estas dos formas:
+
+```bash
+python -m gui.app
+```
+
+o también:
+
+```bash
+python run_gui.py
+```
+
+Desde la interfaz gráfica el usuario puede:
+
+- Seleccionar el tipo de circuito a simular: RC, RL, RLC en serie o paralelo, y circuito personalizado.
+- Modificar los parámetros de simulación, como resistencia, capacitancia, inductancia, voltaje de la fuente, tiempo inicial, tiempo final y paso de simulación.
+- Ver una vista previa del circuito seleccionado, dibujada en un panel Tkinter Canvas con símbolos eléctricos y valores actualizados.
+- Ejecutar la simulación usando el motor numérico existente.
+- Visualizar gráficas de voltaje y corriente generadas con matplotlib dentro de la ventana.
+- Consultar un panel con el resumen de resultados de la simulación.
+
+La interfaz por consola sigue existiendo y continúa funcionando. La GUI es únicamente una forma adicional de interactuar con el simulador.
+
 ## Diagrama UML:
 
 ``` mermaid
@@ -145,12 +172,20 @@ classDiagram
         +_assign_nodes() void
     }
 
+    class CustomCircuit {
+        +resistor Resistor
+        +capacitor Capacitor
+        +inductor Inductor
+        +_assign_nodes() void
+    }
+
     class Solver {
         -BaseCircuit circuit
         -float t_start
         -float t_end
         -float dt
         +build_mna_matrix() tuple
+        +solve() SimResult
         +solve_dc() SimResult
         +solve_transient() SimResult
         +solve_ac() SimResult
@@ -174,6 +209,101 @@ classDiagram
         +save(path) void
     }
 
+    namespace gui {
+        class app {
+            <<module>>
+            +main() void
+        }
+
+        class main_window {
+            <<module>>
+            +create_main_window(root) MainWindow
+        }
+
+        class MainWindow {
+            -SimulationRunner _simulation_runner
+            -ParameterPanel _parameters
+            -PlotPanel _plot_panel
+            -ResultsPanel _results
+            -CircuitPreviewPanel _circuit_preview
+            +_simulate() void
+            +_clear() void
+        }
+
+        class parameter_panel {
+            <<module>>
+        }
+
+        class ParameterPanel {
+            -dict _entries
+            -StringVar _circuit_type
+            +get_config() SimulationConfig
+            +get_preview_data() dict
+            +reset() void
+        }
+
+        class plot_panel {
+            <<module>>
+        }
+
+        class PlotPanel {
+            +show_result(result) void
+            +clear() void
+        }
+
+        class results_panel {
+            <<module>>
+        }
+
+        class ResultsPanel {
+            +show_summary(summary) void
+            +show_error(message) void
+            +clear() void
+        }
+
+        class circuit_preview {
+            <<module>>
+        }
+
+        class CircuitPreviewPanel {
+            +show_preview(preview_data) void
+            +clear() void
+        }
+
+        class simulation_runner {
+            <<module>>
+        }
+
+        class SimulationRunner {
+            -CircuitFactory _circuit_factory
+            +run(config) SimResult
+        }
+
+        class circuit_factory {
+            <<module>>
+        }
+
+        class CircuitFactory {
+            +create(config) BaseCircuit
+        }
+
+        class config {
+            <<module>>
+        }
+
+        class SimulationConfig {
+            <<dataclass>>
+            +str circuit_type
+            +float resistance
+            +float capacitance
+            +float inductance
+            +float source_voltage
+            +float t_start
+            +float t_end
+            +float dt
+        }
+    }
+
     CircuitElement <|-- Resistor
     CircuitElement <|-- Capacitor
     CircuitElement <|-- Inductor
@@ -188,12 +318,44 @@ classDiagram
     BaseCircuit <|-- RLParallel
     BaseCircuit <|-- RLCSeries
     BaseCircuit <|-- RLCParallel
+    BaseCircuit <|-- CustomCircuit
 
     BaseCircuit *-- CircuitElement
     BaseCircuit *-- Source
+    BaseCircuit *-- Switch
 
+    app ..> main_window
+    main_window ..> MainWindow
+    MainWindow *-- ParameterPanel
+    MainWindow *-- PlotPanel
+    MainWindow *-- ResultsPanel
+    MainWindow *-- CircuitPreviewPanel
+    MainWindow *-- SimulationRunner
+    parameter_panel ..> ParameterPanel
+    plot_panel ..> PlotPanel
+    results_panel ..> ResultsPanel
+    circuit_preview ..> CircuitPreviewPanel
+    simulation_runner ..> SimulationRunner
+    circuit_factory ..> CircuitFactory
+    config ..> SimulationConfig
+
+    ParameterPanel ..> SimulationConfig
+    ParameterPanel ..> CircuitFactory
+    CircuitPreviewPanel ..> CircuitFactory
+    SimulationRunner *-- CircuitFactory
+    SimulationRunner ..> Solver
+    CircuitFactory ..> SimulationConfig
+    CircuitFactory ..> BaseCircuit
+    CircuitFactory ..> Resistor
+    CircuitFactory ..> Capacitor
+    CircuitFactory ..> Inductor
+    CircuitFactory ..> Switch
+    CircuitFactory ..> DCVoltageSource
+    PlotPanel ..> SimResult
+    ResultsPanel ..> SimResult
     BaseCircuit ..> Solver
     Solver ..> SimResult
+    Solver ..> BaseCircuit
     Plotter <.. SimResult
 
 ``` 
