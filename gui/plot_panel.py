@@ -11,7 +11,9 @@ class PlotPanel(ttk.LabelFrame):
         self._toolbar = None
         self._figure = None
 
-        self._empty_label = ttk.Label(self, text="Ejecute una simulación para ver la gráfica.")
+        self._empty_label = ttk.Label(
+            self, text="Ejecute una simulación para ver la gráfica."
+        )
         self._empty_label.pack(expand=True)
 
     def show_result(self, result):
@@ -47,8 +49,12 @@ class PlotPanel(ttk.LabelFrame):
         ax_voltage, ax_current = axes
 
         for label in labels:
-            ax_voltage.plot(result.time, result.get_voltage(label), label=label, linewidth=1.8)
-            ax_current.plot(result.time, result.get_current(label), label=label, linewidth=1.8)
+            ax_voltage.plot(
+                result.time, result.get_voltage(label), label=label, linewidth=1.8
+            )
+            ax_current.plot(
+                result.time, result.get_current(label), label=label, linewidth=1.8
+            )
 
         ax_voltage.set_title("Voltaje vs Tiempo")
         ax_voltage.set_ylabel("Voltaje [V]")
@@ -61,5 +67,27 @@ class PlotPanel(ttk.LabelFrame):
         ax_current.grid(True)
         ax_current.legend(loc="best")
 
+        # Ajuste de escala
+        self._fix_y_limits(ax_voltage, [result.get_voltage(l) for l in labels])
+        self._fix_y_limits(ax_current, [result.get_current(l) for l in labels])
+
         figure.tight_layout()
         return figure
+
+    def _fix_y_limits(self, ax, arrays: list, margin: float = 0.1) -> None:
+        """Fija el eje Y evitando zoom excesivo en variaciones numéricas."""
+        import numpy as np
+
+        all_data = np.concatenate(arrays)
+        vmax = np.max(all_data)
+        vmin = np.min(all_data)
+        rango = vmax - vmin
+
+        if rango < 1e-9:
+            centro = (vmax + vmin) / 2
+            if abs(centro) < 1e-9:
+                ax.set_ylim(-0.1, 0.1)
+            else:
+                ax.set_ylim(centro * (1 - margin), centro * (1 + margin))
+        else:
+            ax.set_ylim(vmin - rango * margin, vmax + rango * margin)
