@@ -57,7 +57,14 @@ class CircuitPreviewPanel(ttk.LabelFrame):
         draw_methods.get(circuit_type, self._draw_unknown)(x0, y0, x1, y1)
 
     def _draw_background(self, width: float, height: float, margin: float):
-        self._rounded_rect(margin * 0.35, margin * 0.35, width - margin * 0.35, height - margin * 0.35, 12, "#ffffff")
+        self._rounded_rect(
+            margin * 0.35,
+            margin * 0.35,
+            width - margin * 0.35,
+            height - margin * 0.35,
+            12,
+            "#ffffff",
+        )
 
     def _draw_rc_series(self, x0: float, y0: float, x1: float, y1: float):
         self._draw_series(x0, y0, x1, y1, ("R", "C"))
@@ -77,7 +84,9 @@ class CircuitPreviewPanel(ttk.LabelFrame):
     def _draw_rlc_parallel(self, x0: float, y0: float, x1: float, y1: float):
         self._draw_parallel(x0, y0, x1, y1, ("R", "L", "C"))
 
-    def _draw_series(self, x0: float, y0: float, x1: float, y1: float, components: tuple[str, ...]):
+    def _draw_series(
+        self, x0: float, y0: float, x1: float, y1: float, components: tuple[str, ...]
+    ):
         width = x1 - x0
         height = y1 - y0
         top = y0 + height * 0.30
@@ -99,7 +108,9 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             cx = path_start + pitch * (index + 0.5)
             self._wire(path_start + pitch * index, top, cx - symbol_width * 0.62, top)
             self._component(component, cx, top, symbol_width, height * 0.14, "above")
-            self._wire(cx + symbol_width * 0.62, top, path_start + pitch * (index + 1), top)
+            self._wire(
+                cx + symbol_width * 0.62, top, path_start + pitch * (index + 1), top
+            )
 
         self._wire(right, top, right, bottom)
         self._wire(right, bottom, left + width * 0.35, bottom)
@@ -107,7 +118,9 @@ class CircuitPreviewPanel(ttk.LabelFrame):
         self._wire(left + width * 0.165, bottom, left, bottom)
         self._arrow(left + width * 0.47, bottom, left + width * 0.34, bottom)
 
-    def _draw_parallel(self, x0: float, y0: float, x1: float, y1: float, components: tuple[str, ...]):
+    def _draw_parallel(
+        self, x0: float, y0: float, x1: float, y1: float, components: tuple[str, ...]
+    ):
         width = x1 - x0
         height = y1 - y0
         top = y0 + height * 0.18
@@ -119,7 +132,7 @@ class CircuitPreviewPanel(ttk.LabelFrame):
 
         self._wire(left, top, left, bottom)
         self._source(left, (top + bottom) / 2, source_radius)
-        self._wire(left, top, bus_right, top)
+
         self._wire(bus_right, top, bus_right, bottom)
         self._wire(bus_right, bottom, left + width * 0.28, bottom)
         self._switch(left + width * 0.18, bottom, width * 0.15)
@@ -132,13 +145,21 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             self._junction(bus_left, y)
             self._junction(bus_right, y)
             self._wire(bus_left, y, (bus_left + bus_right) / 2 - symbol_width * 0.62, y)
-            self._component(component, (bus_left + bus_right) / 2, y, symbol_width, height * 0.12, "inline")
-            self._wire((bus_left + bus_right) / 2 + symbol_width * 0.62, y, bus_right, y)
+            self._component(
+                component,
+                (bus_left + bus_right) / 2,
+                y,
+                symbol_width,
+                height * 0.12,
+                "inline",
+            )
+            self._wire(
+                (bus_left + bus_right) / 2 + symbol_width * 0.62, y, bus_right, y
+            )
             self._arrow(bus_left + width * 0.05, y, bus_left + width * 0.12, y)
 
         self._wire(bus_left, top, bus_left, bottom)
         self._wire(left, top, bus_left, top)
-        self._wire(left, bottom, bus_left, bottom)
 
     def _draw_custom(self, x0: float, y0: float, x1: float, y1: float):
         width = x1 - x0
@@ -153,7 +174,9 @@ class CircuitPreviewPanel(ttk.LabelFrame):
         self._wire(left, top, left, bottom)
         self._source(left, (top + bottom) / 2, source_radius)
         self._wire(left, top, x0 + width * 0.27, top)
-        self._component("R", x0 + width * 0.42, top, width * 0.20, height * 0.13, "above")
+        self._component(
+            "R", x0 + width * 0.42, top, width * 0.20, height * 0.13, "above"
+        )
         self._wire(x0 + width * 0.54, top, node_x, top)
         self._wire(node_x, top, node_x, bottom)
         self._wire(right, top, right, bottom)
@@ -166,14 +189,24 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             self._junction(node_x, y)
             self._junction(right, y)
             self._wire(node_x, y, x0 + width * 0.67, y)
-            self._component(component, x0 + width * 0.75, y, width * 0.16, height * 0.11, "inline")
+            self._component(
+                component, x0 + width * 0.75, y, width * 0.16, height * 0.11, "inline"
+            )
             self._wire(x0 + width * 0.84, y, right, y)
             self._arrow(node_x + width * 0.04, y, node_x + width * 0.11, y)
 
     def _draw_unknown(self, x0: float, y0: float, x1: float, y1: float):
         self._label((x0 + x1) / 2, (y0 + y1) / 2, "Vista no disponible", self.TEXT)
 
-    def _component(self, component: str, x: float, y: float, width: float, height: float, label_position: str):
+    def _component(
+        self,
+        component: str,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        label_position: str,
+    ):
         if component == "R":
             self._resistor(x, y, width, height)
             text = f"R1  R = {self._value('resistance')} ohm"
@@ -203,7 +236,9 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             points.append((start + step * index, y - amp if index % 2 else y + amp))
         points.append((x + width / 2 - lead, y))
         self._wire(x - width / 2, y, start, y, color=self.RESISTOR)
-        self._canvas.create_line(points, fill=self.RESISTOR, width=2.6, joinstyle="round", capstyle="round")
+        self._canvas.create_line(
+            points, fill=self.RESISTOR, width=2.6, joinstyle="round", capstyle="round"
+        )
         self._wire(x + width / 2 - lead, y, x + width / 2, y, color=self.RESISTOR)
 
     def _capacitor(self, x: float, y: float, width: float, height: float):
@@ -211,8 +246,22 @@ class CircuitPreviewPanel(ttk.LabelFrame):
         plate_height = max(28, height * 0.70)
         self._wire(x - width / 2, y, x - plate_gap, y, color=self.CAPACITOR)
         self._wire(x + plate_gap, y, x + width / 2, y, color=self.CAPACITOR)
-        self._wire(x - plate_gap, y - plate_height / 2, x - plate_gap, y + plate_height / 2, 3, self.CAPACITOR)
-        self._wire(x + plate_gap, y - plate_height / 2, x + plate_gap, y + plate_height / 2, 3, self.CAPACITOR)
+        self._wire(
+            x - plate_gap,
+            y - plate_height / 2,
+            x - plate_gap,
+            y + plate_height / 2,
+            3,
+            self.CAPACITOR,
+        )
+        self._wire(
+            x + plate_gap,
+            y - plate_height / 2,
+            x + plate_gap,
+            y + plate_height / 2,
+            3,
+            self.CAPACITOR,
+        )
 
     def _inductor(self, x: float, y: float, width: float, height: float):
         loops = 4
@@ -246,10 +295,28 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             width=2.6,
             fill="#fff7ed",
         )
-        self._canvas.create_line(x, y - radius * 0.62, x, y - radius * 0.20, fill=self.SOURCE, width=2)
-        self._canvas.create_line(x - radius * 0.20, y - radius * 0.41, x + radius * 0.20, y - radius * 0.41, fill=self.SOURCE, width=2)
-        self._canvas.create_line(x - radius * 0.20, y + radius * 0.36, x + radius * 0.20, y + radius * 0.36, fill=self.SOURCE, width=2)
-        self._label(x, y - radius - 20, f"Vs  {self._value('source_voltage')} V", self.SOURCE)
+        self._canvas.create_line(
+            x, y - radius * 0.62, x, y - radius * 0.20, fill=self.SOURCE, width=2
+        )
+        self._canvas.create_line(
+            x - radius * 0.20,
+            y - radius * 0.41,
+            x + radius * 0.20,
+            y - radius * 0.41,
+            fill=self.SOURCE,
+            width=2,
+        )
+        self._canvas.create_line(
+            x - radius * 0.20,
+            y + radius * 0.36,
+            x + radius * 0.20,
+            y + radius * 0.36,
+            fill=self.SOURCE,
+            width=2,
+        )
+        self._label(
+            x, y - radius - 20, f"Vs  {self._value('source_voltage')} V", self.SOURCE
+        )
 
     def _switch(self, x: float, y: float, width: float):
         width = max(48, width)
@@ -261,11 +328,34 @@ class CircuitPreviewPanel(ttk.LabelFrame):
         self._wire(right, y, right + width * 0.20, y)
         self._node(left, y, self.SWITCH)
         self._node(right, y, self.SWITCH)
-        self._canvas.create_line(left, y, blade_end_x, blade_end_y, fill=self.SWITCH, width=2.6, capstyle="round")
-        self._canvas.create_line(blade_end_x, blade_end_y, right - width * 0.08, blade_end_y, fill=self.SWITCH, width=2)
+        self._canvas.create_line(
+            left,
+            y,
+            blade_end_x,
+            blade_end_y,
+            fill=self.SWITCH,
+            width=2.6,
+            capstyle="round",
+        )
+        self._canvas.create_line(
+            blade_end_x,
+            blade_end_y,
+            right - width * 0.08,
+            blade_end_y,
+            fill=self.SWITCH,
+            width=2,
+        )
         self._label(x, y + 22, "SW1", self.SWITCH)
 
-    def _wire(self, x1: float, y1: float, x2: float, y2: float, line_width: float = 2.2, color: str | None = None):
+    def _wire(
+        self,
+        x1: float,
+        y1: float,
+        x2: float,
+        y2: float,
+        line_width: float = 2.2,
+        color: str | None = None,
+    ):
         self._canvas.create_line(
             x1,
             y1,
@@ -288,16 +378,26 @@ class CircuitPreviewPanel(ttk.LabelFrame):
             arrow=tk.LAST,
             arrowshape=(9, 11, 4),
         )
-        self._canvas.create_text((x1 + x2) / 2, y1 - 10, text="i", fill="#475569", font=("Segoe UI", 8, "italic"))
+        self._canvas.create_text(
+            (x1 + x2) / 2,
+            y1 - 10,
+            text="i",
+            fill="#475569",
+            font=("Segoe UI", 8, "italic"),
+        )
 
     def _junction(self, x: float, y: float):
         self._node(x, y, self.WIRE)
 
     def _node(self, x: float, y: float, color: str):
-        self._canvas.create_oval(x - 3.2, y - 3.2, x + 3.2, y + 3.2, fill=color, outline=color)
+        self._canvas.create_oval(
+            x - 3.2, y - 3.2, x + 3.2, y + 3.2, fill=color, outline=color
+        )
 
     def _label(self, x: float, y: float, text: str, color: str):
-        label = self._canvas.create_text(x, y, text=text, fill=color, font=("Segoe UI", 8, "bold"))
+        label = self._canvas.create_text(
+            x, y, text=text, fill=color, font=("Segoe UI", 8, "bold")
+        )
         bbox = self._canvas.bbox(label)
         if bbox is None:
             return
@@ -327,20 +427,68 @@ class CircuitPreviewPanel(ttk.LabelFrame):
     ):
         radius = min(radius, abs(x1 - x0) / 2, abs(y1 - y0) / 2)
         items = [
-            self._canvas.create_rectangle(x0 + radius, y0, x1 - radius, y1, fill=fill, outline=fill),
-            self._canvas.create_rectangle(x0, y0 + radius, x1, y1 - radius, fill=fill, outline=fill),
-            self._canvas.create_arc(x0, y0, x0 + radius * 2, y0 + radius * 2, start=90, extent=90, fill=fill, outline=fill),
-            self._canvas.create_arc(x1 - radius * 2, y0, x1, y0 + radius * 2, start=0, extent=90, fill=fill, outline=fill),
-            self._canvas.create_arc(x1 - radius * 2, y1 - radius * 2, x1, y1, start=270, extent=90, fill=fill, outline=fill),
-            self._canvas.create_arc(x0, y1 - radius * 2, x0 + radius * 2, y1, start=180, extent=90, fill=fill, outline=fill),
+            self._canvas.create_rectangle(
+                x0 + radius, y0, x1 - radius, y1, fill=fill, outline=fill
+            ),
+            self._canvas.create_rectangle(
+                x0, y0 + radius, x1, y1 - radius, fill=fill, outline=fill
+            ),
+            self._canvas.create_arc(
+                x0,
+                y0,
+                x0 + radius * 2,
+                y0 + radius * 2,
+                start=90,
+                extent=90,
+                fill=fill,
+                outline=fill,
+            ),
+            self._canvas.create_arc(
+                x1 - radius * 2,
+                y0,
+                x1,
+                y0 + radius * 2,
+                start=0,
+                extent=90,
+                fill=fill,
+                outline=fill,
+            ),
+            self._canvas.create_arc(
+                x1 - radius * 2,
+                y1 - radius * 2,
+                x1,
+                y1,
+                start=270,
+                extent=90,
+                fill=fill,
+                outline=fill,
+            ),
+            self._canvas.create_arc(
+                x0,
+                y1 - radius * 2,
+                x0 + radius * 2,
+                y1,
+                start=180,
+                extent=90,
+                fill=fill,
+                outline=fill,
+            ),
         ]
         if outline:
             items.extend(
                 [
-                    self._canvas.create_line(x0 + radius, y0, x1 - radius, y0, fill=outline),
-                    self._canvas.create_line(x1, y0 + radius, x1, y1 - radius, fill=outline),
-                    self._canvas.create_line(x0 + radius, y1, x1 - radius, y1, fill=outline),
-                    self._canvas.create_line(x0, y0 + radius, x0, y1 - radius, fill=outline),
+                    self._canvas.create_line(
+                        x0 + radius, y0, x1 - radius, y0, fill=outline
+                    ),
+                    self._canvas.create_line(
+                        x1, y0 + radius, x1, y1 - radius, fill=outline
+                    ),
+                    self._canvas.create_line(
+                        x0 + radius, y1, x1 - radius, y1, fill=outline
+                    ),
+                    self._canvas.create_line(
+                        x0, y0 + radius, x0, y1 - radius, fill=outline
+                    ),
                 ]
             )
         return tuple(items)
