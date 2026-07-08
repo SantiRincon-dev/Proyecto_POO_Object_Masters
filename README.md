@@ -360,41 +360,6 @@ classDiagram
 
 ``` 
 
-## Interfaz gráfica:
-
-### Tkinter
-Ventajas:
-
- - Hay mucha documentación y ejemplos.
- - Es la más simple.
-
-Desventajas:
-
- - Incrustar gráficas de matplotlib dentro de la ventana requiere código adicional.
- - Visualmente es anticuada.
-
-### PyQt6
-Ventajas:
-
- - Interfaz visual moderna.
- - Integración nativa con matplotlib.
-
-Desventajas:
-
- - Es la más compleja de aprender.
-
-### Streamlit
-Ventajas:
-
- - Rápida de implementar.
- - Las gráficas de matplotlib y plotly se integran de forma nativa.
-
-Desventajas:
-
- - Corre en el navegador como una app web.
- - Re-ejecuta todo el script en cada interacción
-
-
 
 
 # Autores:
