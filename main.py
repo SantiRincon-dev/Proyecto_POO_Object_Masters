@@ -26,7 +26,7 @@ def simulate_rc_series():
 
     circuit = RCSeries(resistor=r, capacitor=c, source=src, switch=sw)
 
-    # Tiempo de simulación: 5 * tau = 5 * RC = 5 * 1000 * 1e-6 = 5ms
+    # Tiempo de simulación: 5 * tau = 5 * RC = 5 * 1000 * 1e-6 = 5ms.
     tau = r.resistance * c.capacitance
     t_end = 5 * tau
     dt = tau / 1000
