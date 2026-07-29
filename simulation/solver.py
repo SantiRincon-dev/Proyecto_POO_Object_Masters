@@ -204,7 +204,8 @@ class Solver:
             )
 
         # Generar vector de tiempo completo para que la gráfica sea una línea
-        time_steps = np.arange(self._t_start, self._t_end, self._dt)
+        n_steps = int(round((self._t_end - self._t_start) / self._dt)) + 1
+        time_steps = np.linspace(self._t_start, self._t_end, n_steps)
         solutions = [x] * len(time_steps)
 
         voltages, currents = self._extract_results(solutions, node_map)
