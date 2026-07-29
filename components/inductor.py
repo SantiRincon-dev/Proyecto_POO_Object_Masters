@@ -119,6 +119,7 @@ class Inductor(CircuitElement):
             G[j][k] -= 1
             G[k][j] -= 1
 
+        # El que sean en signos negativos "-=" no es un error, está planteado para que la ecuación funcione así
         G[k][k] -= self._inductance / dt
         b[k] -= (self._inductance / dt) * self._I_prev
 

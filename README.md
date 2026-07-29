@@ -71,42 +71,47 @@ classDiagram
         -int node_pos
         -int node_neg
         -str label
-        +stamp(G, b, nodes) void
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
         +get_voltage(x, node_map) float
-        +get_current(x, node_map) float
     }
 
     class Resistor {
         -float resistance
-        +stamp(G, b, nodes) void
-        +get_current(x, node_map) float
-        +get_voltage(x, node_map) float
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
     }
 
     class Capacitor {
         -float capacitance
         -float initial_voltage
-        +stamp(G, b, nodes, dt, Vp) void
-        +get_current(x, node_map) float
-        +get_voltage(x, node_map) float
+        -float V_prev
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
+        +update_state(x, node_map) void
+        +reset() void
     }
 
     class Inductor {
         -float inductance
         -float initial_current
         -int current_var_idx
-        +stamp(G, b, nodes, dt, Ip) void
-        +get_current(x, node_map) float
+        -float I_prev
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
         +get_voltage(x, node_map) float
+        +update_state(x, node_map) void
+        +reset() void
     }
 
     class Switch {
         -float t_close
         -bool _closed
         +is_closed(t) bool
-        +stamp(G, b, nodes, t) void
-        +get_current(x, node_map) float
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
         +get_voltage(x, node_map) float
+        +reset() void
     }
 
     class Source {
@@ -115,37 +120,29 @@ classDiagram
         -int node_neg
         -str label
         -int current_var_idx
-        +stamp(G, b, nodes) void
+        +stamp(G, b, node_map, **kwargs) void
         +get_current(x) float
         +get_voltage(x) float
     }
 
     class DCVoltageSource {
         -float voltage
-        +stamp(G, b, nodes) void
-        +get_current(x) float
-        +get_voltage(x) float
-    }
-
-    class ACVoltageSource {
-        -float amplitude
-        -float frequency
-        -float phase
-        +stamp(G, b, nodes, t) void
-        +get_current(x) float
-        +get_voltage(t) float
+        +stamp(G, b, node_map, **kwargs) void
+        +get_current(x, node_map, **kwargs) float
+        +get_voltage(x, node_map) float
     }
 
     class BaseCircuit {
         <<abstract>>
         -Source source
         -Switch switch
-        -list~CircuitElement~ elements
+        -list elements
         -int node_count
         -int ground_node
         +_assign_nodes() void
         +get_elements() list
         +get_sources() list
+        +get_all() list
     }
 
     class RCSeries {
@@ -184,11 +181,12 @@ classDiagram
         -float t_start
         -float t_end
         -float dt
-        +build_mna_matrix() tuple
+        -int _system_size
         +solve() SimResult
         +solve_dc() SimResult
         +solve_transient() SimResult
-        +solve_ac() SimResult
+        -_build_mna_matrix(t, node_map, dt) tuple
+        -_assign_current_var_indices() int
     }
 
     class SimResult {
@@ -197,15 +195,19 @@ classDiagram
         -dict currents
         +to_dataframe() DataFrame
         +summary() str
+        +get_voltage(label) np.ndarray
+        +get_current(label) np.ndarray
+        +get_power(label) np.ndarray
     }
 
     class Plotter {
         -SimResult result
         -str style
-        +plot_voltage() Figure
-        +plot_current() Figure
-        +plot_all() Figure
-        +plot_bode() Figure
+        +plot_voltage(labels=None, show=True) Figure
+        +plot_current(labels=None, show=True) Figure
+        +plot_elements(labels, show=True) Figure
+        +plot_all(show=True) Figure
+        +plot_power(show=True) Figure
         +save(path) void
     }
 
@@ -226,8 +228,10 @@ classDiagram
             -PlotPanel _plot_panel
             -ResultsPanel _results
             -CircuitPreviewPanel _circuit_preview
+            +_build() void
             +_simulate() void
             +_clear() void
+            +_update_circuit_preview(preview_data) void
         }
 
         class parameter_panel {

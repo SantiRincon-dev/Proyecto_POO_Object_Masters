@@ -59,10 +59,10 @@ class RCSeries(BaseCircuit):
         self._elements = [self._resistor, self._capacitor]
 
 
-def __repr__(self) -> str:
-    return (
-        f"RCSeries ["
-        f"R={self._resistor.resistance}Ω, "
-        f"C={self._capacitor.capacitance}F, "
-        f"V={self._source.voltage}V]"
-    )
+    def __repr__(self) -> str:
+        return (
+            f"RCSeries ["
+            f"R={self._resistor.resistance}Ω, "
+            f"C={self._capacitor.capacitance}F, "
+            f"V={self._source.get_voltage}V]"
+        )

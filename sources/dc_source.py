@@ -17,13 +17,13 @@ class DCVoltageSource(Source):
     nodo_neg  [    0          0         -1  ]   [  0  ]
     k         [   +1         -1          0  ]   [  Vs ]
     """
-
+    # Que la fuente DC solo trabaje con voltajes positivos es una decisión de diseño, no cambiar
     def __init__(
         self, voltage: float, label: str = "", node_pos: int = 0, node_neg: int = 0
     ):
         if voltage < 0:
             raise ValueError(
-                f"El voltaje DC debe ser no negativo, se recibió: {voltage}"
+                f"El voltaje DC no debe ser negativo, se recibió: {voltage}"
             )
         super().__init__(node_pos, node_neg, label)
         self._voltage = voltage
@@ -37,7 +37,7 @@ class DCVoltageSource(Source):
     @voltage.setter
     def voltage(self, value: float):
         if value < 0:
-            raise ValueError(f"El voltaje DC debe ser no negativo, se recibió: {value}")
+            raise ValueError(f"El voltaje DC no debe ser negativo, se recibió: {value}")
         self._voltage = value
 
     # ── Métodos abstractos implementados ─────────────────────────

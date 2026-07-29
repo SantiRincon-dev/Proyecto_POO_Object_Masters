@@ -213,6 +213,7 @@ class Plotter:
 
         fig = plt.figure(figsize=(14, 4 * n))
         gs = gridspec.GridSpec(n, 2, figure=fig)
+        # Este print es necesario para la comprobación del funcionamiento del plotter, no eliminar
         print(
             f"time: min={self._result.time.min()}, max={self._result.time.max()}, len={len(self._result.time)}"
         )

@@ -18,7 +18,7 @@ class Switch(CircuitElement):
     la simulación.
     """
 
-    G_CLOSED = 1e12  # Conductancia cuando está cerrado [S]
+    G_CLOSED = 1e8  # Conductancia cuando está cerrado [S]
     # Suficientemente alta para aproximar un cortocircuito
     # sin causar problemas numéricos
 

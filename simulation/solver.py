@@ -148,7 +148,8 @@ class Solver:
         self._system_size = self._assign_current_var_indices()
         node_map = self._build_node_map()
 
-        time_steps = np.arange(self._t_start, self._t_end, self._dt)
+        n_steps = int(round((self._t_end - self._t_start) / self._dt)) + 1
+        time_steps = np.linspace(self._t_start, self._t_end, n_steps)
 
         all_elements = self._circuit.get_all()
         labels = [e.label if e.label else e.__class__.__name__ for e in all_elements]
